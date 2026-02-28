@@ -98,14 +98,19 @@ export default function ShareButtons({
     }
   }, [name, kanji, story, viralText, shareUrl]);
 
+  // モバイル判定（タッチデバイス = スマホ/タブレット）
+  const isMobile =
+    typeof window !== "undefined" &&
+    ("ontouchstart" in window || navigator.maxTouchPoints > 0);
+
   // Share Your Kanji ボタン
   const handleShareClick = useCallback(() => {
-    if (typeof navigator !== "undefined" && "share" in navigator) {
+    if (isMobile && typeof navigator !== "undefined" && "share" in navigator) {
       handleShareMobile();
     } else {
       setShowShareMenu((prev) => !prev);
     }
-  }, [handleShareMobile]);
+  }, [isMobile, handleShareMobile]);
 
   // X (Twitter) Intent
   const handleShareX = useCallback(() => {
