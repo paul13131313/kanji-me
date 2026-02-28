@@ -85,14 +85,14 @@ export default function KanjiCard({
           {name}
         </p>
 
-        {/* 漢字（縦書き・完全中央） */}
+        {/* 漢字（縦書き・絶対配置で完全中央） */}
         <div
           style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
             writingMode: "vertical-rl",
-            marginTop: "8px",
           }}
         >
           <p
@@ -105,7 +105,6 @@ export default function KanjiCard({
               whiteSpace: "nowrap",
               margin: 0,
               padding: 0,
-              textAlign: "center",
             }}
           >
             {kanji}
