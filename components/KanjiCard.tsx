@@ -85,11 +85,11 @@ export default function KanjiCard({
           {name}
         </p>
 
-        {/* 漢字（縦書き・絶対配置で完全中央） */}
+        {/* 漢字（縦書き・光学的中心に配置） */}
         <div
           style={{
             position: "absolute",
-            top: "50%",
+            top: "46%",
             left: "50%",
             transform: "translate(-50%, -50%)",
             writingMode: "vertical-rl",
