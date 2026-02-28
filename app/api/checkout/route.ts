@@ -25,8 +25,8 @@ export async function POST() {
           quantity: 1,
         },
       ],
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL || "https://kanji-me.vercel.app"}/?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || "https://kanji-me.vercel.app"}/`,
+      success_url: "https://kanji-me.vercel.app/?session_id={CHECKOUT_SESSION_ID}",
+      cancel_url: "https://kanji-me.vercel.app/",
     });
 
     return NextResponse.json({ url: session.url });
