@@ -5,7 +5,6 @@ import NameInput from "@/components/NameInput";
 import KanjiCard from "@/components/KanjiCard";
 import MeaningList from "@/components/MeaningList";
 import ShareButtons from "@/components/ShareButtons";
-import StyleSelector from "@/components/StyleSelector";
 
 interface Character {
   kanji: string;
@@ -21,7 +20,6 @@ interface KanjiResult {
   characters: Character[];
 }
 
-export type KanjiStyle = "kaisho" | "gyosho" | "sosho";
 
 function getTodayKey() {
   return new Date().toISOString().slice(0, 10);
@@ -54,7 +52,6 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [previousKanji, setPreviousKanji] = useState<string[]>([]);
-  const [kanjiStyle, setKanjiStyle] = useState<KanjiStyle>("kaisho");
   const [paidSessionId, setPaidSessionId] = useState<string | null>(null);
   const [paidRemaining, setPaidRemaining] = useState(0);
   const [showLimitReached, setShowLimitReached] = useState(false);
@@ -301,10 +298,8 @@ export default function Home() {
             kanji={result.kanji}
             katakana={result.katakana}
             story={result.story}
-            kanjiStyle={kanjiStyle}
           />
-          <StyleSelector value={kanjiStyle} onChange={setKanjiStyle} />
-          <MeaningList characters={result.characters} kanjiStyle={kanjiStyle} />
+          <MeaningList characters={result.characters} />
           <ShareButtons
             name={inputName}
             kanji={result.kanji}
