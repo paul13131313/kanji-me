@@ -7,6 +7,14 @@ interface KanjiCardProps {
   story: string;
 }
 
+// 漢字の文字数に応じてフォントサイズを計算（必ず1列に収める）
+function getKanjiFontSize(length: number): number {
+  if (length <= 2) return 80;
+  if (length === 3) return 60;
+  if (length === 4) return 50;
+  return 40;
+}
+
 export default function KanjiCard({
   name,
   kanji,
@@ -17,15 +25,12 @@ export default function KanjiCard({
     <div
       id="kanji-card"
       className="relative w-full max-w-[360px] mx-auto rounded-lg overflow-hidden shadow-lg"
-      style={{ aspectRatio: "3 / 4" }}
+      style={{ aspectRatio: "3 / 4", backgroundColor: "#141314" }}
     >
-      {/* 和紙テクスチャ背景 */}
-      <div className="absolute inset-0 washi-bg" />
-
-      {/* 上部の朱色ライン */}
+      {/* 上部のオレンジライン */}
       <div
         className="absolute top-0 left-6 right-6 h-[2px]"
-        style={{ backgroundColor: "#c41e3a", opacity: 0.6 }}
+        style={{ backgroundColor: "#FD551D" }}
       />
 
       {/* コンテンツ */}
@@ -33,12 +38,12 @@ export default function KanjiCard({
         {/* ローマ字名 */}
         <p
           className="text-xs tracking-[0.3em] uppercase font-medium"
-          style={{ color: "#a8a29e" }}
+          style={{ color: "#FD551D" }}
         >
           {name}
         </p>
 
-        {/* 漢字（縦書き） */}
+        {/* 漢字（縦書き・必ず1列） */}
         <div
           className="flex-1 flex items-center justify-center"
           style={{ writingMode: "vertical-rl" }}
@@ -48,8 +53,9 @@ export default function KanjiCard({
             style={{
               fontFamily: "'Shippori Mincho B1', serif",
               fontWeight: 900,
-              fontSize: `${Math.max(48, 80 - (kanji.length - 2) * 10)}px`,
+              fontSize: `${getKanjiFontSize(kanji.length)}px`,
               color: "#ffffff",
+              whiteSpace: "nowrap",
             }}
           >
             {kanji}
@@ -59,7 +65,7 @@ export default function KanjiCard({
         {/* カタカナ読み */}
         <p
           className="text-sm tracking-widest"
-          style={{ color: "#78716c" }}
+          style={{ color: "#FD551D" }}
         >
           {katakana}
         </p>
@@ -67,7 +73,7 @@ export default function KanjiCard({
         {/* story（漢字の物語） */}
         <p
           className="text-[10px] italic text-center mt-2 whitespace-nowrap w-full"
-          style={{ color: "#a8a29e" }}
+          style={{ color: "#666" }}
         >
           &ldquo;{story}&rdquo;
         </p>
@@ -75,7 +81,7 @@ export default function KanjiCard({
         {/* ウォーターマーク */}
         <p
           className="absolute bottom-2 left-0 right-0 text-[8px] tracking-[0.15em] text-center"
-          style={{ color: "#d6d3d1", opacity: 0.4 }}
+          style={{ color: "#444" }}
         >
           kanjime.vercel.app
         </p>
