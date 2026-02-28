@@ -24,38 +24,80 @@ export default function KanjiCard({
   return (
     <div
       id="kanji-card"
-      className="relative w-full max-w-[360px] mx-auto rounded-lg overflow-hidden shadow-lg"
-      style={{ aspectRatio: "3 / 4", backgroundColor: "#141314" }}
+      style={{
+        position: "relative",
+        width: "100%",
+        maxWidth: "360px",
+        marginLeft: "auto",
+        marginRight: "auto",
+        borderRadius: "8px",
+        overflow: "hidden",
+        boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)",
+        aspectRatio: "3 / 4",
+        backgroundColor: "#141314",
+      }}
     >
       {/* 上部のオレンジライン */}
       <div
-        className="absolute top-0 left-6 right-6 h-[2px]"
-        style={{ backgroundColor: "#FD551D" }}
+        style={{
+          position: "absolute",
+          top: 0,
+          left: "24px",
+          right: "24px",
+          height: "2px",
+          backgroundColor: "#FD551D",
+        }}
       />
 
       {/* コンテンツ */}
-      <div className="relative z-10 flex flex-col items-center justify-between h-full py-8 px-6">
+      <div
+        style={{
+          position: "relative",
+          zIndex: 10,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "space-between",
+          height: "100%",
+          paddingTop: "32px",
+          paddingBottom: "32px",
+          paddingLeft: "24px",
+          paddingRight: "24px",
+        }}
+      >
         {/* ローマ字名 */}
         <p
-          className="text-xs tracking-[0.3em] uppercase font-medium"
-          style={{ color: "#FD551D" }}
+          style={{
+            fontSize: "12px",
+            letterSpacing: "0.3em",
+            textTransform: "uppercase",
+            fontWeight: 500,
+            color: "#FD551D",
+            margin: 0,
+          }}
         >
           {name}
         </p>
 
         {/* 漢字（縦書き・必ず1列） */}
         <div
-          className="flex-1 flex items-center justify-center"
-          style={{ writingMode: "vertical-rl" }}
+          style={{
+            flex: 1,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            writingMode: "vertical-rl",
+          }}
         >
           <p
-            className="leading-none"
             style={{
+              lineHeight: 1,
               fontFamily: "'Shippori Mincho B1', serif",
               fontWeight: 900,
               fontSize: `${getKanjiFontSize(kanji.length)}px`,
               color: "#ffffff",
               whiteSpace: "nowrap",
+              margin: 0,
             }}
           >
             {kanji}
@@ -64,24 +106,45 @@ export default function KanjiCard({
 
         {/* カタカナ読み */}
         <p
-          className="text-sm tracking-widest"
-          style={{ color: "#FD551D" }}
+          style={{
+            fontSize: "14px",
+            letterSpacing: "0.1em",
+            color: "#FD551D",
+            margin: 0,
+          }}
         >
           {katakana}
         </p>
 
         {/* story（漢字の物語） */}
         <p
-          className="text-[10px] italic text-center mt-2 whitespace-nowrap w-full"
-          style={{ color: "#666" }}
+          style={{
+            fontSize: "10px",
+            fontStyle: "italic",
+            textAlign: "center",
+            marginTop: "8px",
+            marginBottom: 0,
+            whiteSpace: "nowrap",
+            width: "100%",
+            color: "#666666",
+          }}
         >
           &ldquo;{story}&rdquo;
         </p>
 
         {/* ウォーターマーク */}
         <p
-          className="absolute bottom-2 left-0 right-0 text-[8px] tracking-[0.15em] text-center"
-          style={{ color: "#444" }}
+          style={{
+            position: "absolute",
+            bottom: "8px",
+            left: 0,
+            right: 0,
+            fontSize: "8px",
+            letterSpacing: "0.15em",
+            textAlign: "center",
+            color: "#444444",
+            margin: 0,
+          }}
         >
           kanjime.vercel.app
         </p>
