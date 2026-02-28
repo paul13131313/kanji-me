@@ -1,10 +1,19 @@
 "use client";
 
+import type { KanjiStyle } from "@/app/page";
+
+const FONT_MAP: Record<string, string> = {
+  kaisho: "'Shippori Mincho B1', serif",
+  gyosho: "'Yuji Syuku', serif",
+  sosho: "'Zen Antique', serif",
+};
+
 interface KanjiCardProps {
   name: string;
   kanji: string;
   katakana: string;
   story: string;
+  kanjiStyle?: KanjiStyle;
 }
 
 export default function KanjiCard({
@@ -12,6 +21,7 @@ export default function KanjiCard({
   kanji,
   katakana,
   story,
+  kanjiStyle = "kaisho",
 }: KanjiCardProps) {
   return (
     <div
@@ -40,7 +50,7 @@ export default function KanjiCard({
           <p
             className="text-white leading-none"
             style={{
-              fontFamily: "'Shippori Mincho B1', serif",
+              fontFamily: FONT_MAP[kanjiStyle],
               fontWeight: 900,
               fontSize: `${Math.max(48, 80 - (kanji.length - 2) * 10)}px`,
             }}

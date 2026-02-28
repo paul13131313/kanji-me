@@ -6,12 +6,16 @@ interface ShareButtonsProps {
   name: string;
   kanji: string;
   onTryAnother: () => void;
+  onTryDifferentKanji: () => void;
+  isLoading: boolean;
 }
 
 export default function ShareButtons({
   name,
   kanji,
   onTryAnother,
+  onTryDifferentKanji,
+  isLoading,
 }: ShareButtonsProps) {
   const handleSaveImage = useCallback(async () => {
     const card = document.getElementById("kanji-card");
@@ -30,21 +34,23 @@ export default function ShareButtons({
     link.click();
   }, [name]);
 
+  const shareUrl = `https://kanji-me.vercel.app/${name.toLowerCase().replace(/\s+/g, "-")}`;
+
   const handleShare = useCallback(async () => {
-    const text = `My name in Kanji: ${kanji} (${name}) — Get yours at kanjime.vercel.app`;
+    const text = `My name in Kanji: ${kanji} (${name})`;
 
     if (navigator.share) {
       try {
-        await navigator.share({ title: "KANJI ME", text });
+        await navigator.share({ title: "KANJI ME", text, url: shareUrl });
         return;
       } catch {
         // user cancelled or share failed
       }
     }
 
-    await navigator.clipboard.writeText(text);
+    await navigator.clipboard.writeText(`${text} — ${shareUrl}`);
     alert("Copied to clipboard!");
-  }, [name, kanji]);
+  }, [name, kanji, shareUrl]);
 
   return (
     <div
@@ -77,6 +83,20 @@ export default function ShareButtons({
           Share
         </button>
       </div>
+      <button
+        onClick={onTryDifferentKanji}
+        disabled={isLoading}
+        className="w-full py-3 text-xs font-semibold uppercase tracking-[0.15em]
+                   transition-colors"
+        style={{
+          border: "1px solid #FD551D",
+          color: isLoading ? "#666" : "#FD551D",
+          background: "transparent",
+          opacity: isLoading ? 0.5 : 1,
+        }}
+      >
+        {isLoading ? "Generating..." : "Try Different Kanji"}
+      </button>
       <button
         onClick={onTryAnother}
         className="w-full py-3 text-xs font-semibold uppercase tracking-[0.15em]

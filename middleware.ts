@@ -18,7 +18,7 @@ function cleanup() {
 setInterval(cleanup, 60_000);
 
 export function middleware(request: NextRequest) {
-  // /api/generate のみrate limit対象
+  // /api/generate のみrate limit対象（webhook等は除外）
   if (!request.nextUrl.pathname.startsWith("/api/generate")) {
     return NextResponse.next();
   }

@@ -1,5 +1,13 @@
 "use client";
 
+import type { KanjiStyle } from "@/app/page";
+
+const FONT_MAP: Record<string, string> = {
+  kaisho: "'Shippori Mincho B1', serif",
+  gyosho: "'Yuji Syuku', serif",
+  sosho: "'Zen Antique', serif",
+};
+
 interface Character {
   kanji: string;
   reading: string;
@@ -9,9 +17,10 @@ interface Character {
 
 interface MeaningListProps {
   characters: Character[];
+  kanjiStyle?: KanjiStyle;
 }
 
-export default function MeaningList({ characters }: MeaningListProps) {
+export default function MeaningList({ characters, kanjiStyle = "kaisho" }: MeaningListProps) {
   return (
     <div className="w-full max-w-[360px] mx-auto flex flex-col gap-5">
       {characters.map((char, i) => (
@@ -23,7 +32,7 @@ export default function MeaningList({ characters }: MeaningListProps) {
           <span
             className="text-4xl shrink-0"
             style={{
-              fontFamily: "'Shippori Mincho B1', serif",
+              fontFamily: FONT_MAP[kanjiStyle],
               fontWeight: 700,
               color: "#EEEEEE",
             }}
