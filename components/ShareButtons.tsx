@@ -24,7 +24,7 @@ export default function ShareButtons({
     const html2canvas = (await import("html2canvas")).default;
     const canvas = await html2canvas(card, {
       backgroundColor: null,
-      scale: 2,
+      scale: 5,
       useCORS: true,
     });
 
@@ -63,8 +63,8 @@ export default function ShareButtons({
           className="flex-1 py-3 text-xs font-semibold uppercase tracking-[0.12em]
                      transition-colors"
           style={{
-            border: "1px solid #333",
-            color: "#EEEEEE",
+            border: "1px solid #FD551D",
+            color: "#FD551D",
             background: "transparent",
           }}
         >

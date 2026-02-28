@@ -9,10 +9,10 @@ interface KanjiCardProps {
 
 // 漢字の文字数に応じてフォントサイズを計算（必ず1列に収める）
 function getKanjiFontSize(length: number): number {
-  if (length <= 2) return 80;
-  if (length === 3) return 60;
-  if (length === 4) return 50;
-  return 40;
+  if (length <= 2) return 88;
+  if (length === 3) return 68;
+  if (length === 4) return 54;
+  return 44;
 }
 
 export default function KanjiCard({
@@ -30,11 +30,12 @@ export default function KanjiCard({
         maxWidth: "360px",
         marginLeft: "auto",
         marginRight: "auto",
-        borderRadius: "8px",
+        borderRadius: "12px",
         overflow: "hidden",
-        boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)",
+        boxShadow:
+          "0 20px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.04)",
         aspectRatio: "3 / 4",
-        backgroundColor: "#141314",
+        backgroundColor: "#0A0A0A",
       }}
     >
       {/* 上部のオレンジライン */}
@@ -42,112 +43,135 @@ export default function KanjiCard({
         style={{
           position: "absolute",
           top: 0,
-          left: "24px",
-          right: "24px",
-          height: "2px",
-          backgroundColor: "#FD551D",
+          left: 0,
+          right: 0,
+          height: "3px",
+          background: "linear-gradient(90deg, transparent 6%, #FD551D 6%, #FD551D 94%, transparent 94%)",
         }}
       />
 
-      {/* コンテンツ */}
+      {/* コンテンツ — 完全中央配置 */}
       <div
         style={{
-          position: "relative",
-          zIndex: 10,
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          justifyContent: "space-between",
-          height: "100%",
-          paddingTop: "32px",
-          paddingBottom: "32px",
-          paddingLeft: "24px",
-          paddingRight: "24px",
+          justifyContent: "center",
+          padding: "40px 32px 36px",
         }}
       >
-        {/* ローマ字名 */}
+        {/* ローマ字名 — 上部固定 */}
         <p
           style={{
-            fontSize: "12px",
-            letterSpacing: "0.3em",
+            position: "absolute",
+            top: "32px",
+            left: 0,
+            right: 0,
+            fontSize: "11px",
+            letterSpacing: "0.35em",
             textTransform: "uppercase",
-            fontWeight: 500,
+            fontWeight: 600,
             color: "#FD551D",
             margin: 0,
+            textAlign: "center",
+            fontFamily: "'Space Grotesk', sans-serif",
           }}
         >
           {name}
         </p>
 
-        {/* 漢字（縦書き・必ず1列） */}
+        {/* 漢字（縦書き・完全中央） */}
         <div
           style={{
-            flex: 1,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             writingMode: "vertical-rl",
+            marginTop: "8px",
           }}
         >
           <p
             style={{
-              lineHeight: 1,
+              lineHeight: 1.08,
               fontFamily: "'Shippori Mincho B1', serif",
-              fontWeight: 900,
+              fontWeight: 800,
               fontSize: `${getKanjiFontSize(kanji.length)}px`,
               color: "#ffffff",
               whiteSpace: "nowrap",
               margin: 0,
+              padding: 0,
+              textAlign: "center",
             }}
           >
             {kanji}
           </p>
         </div>
 
-        {/* カタカナ読み */}
-        <p
-          style={{
-            fontSize: "14px",
-            letterSpacing: "0.1em",
-            color: "#FD551D",
-            margin: 0,
-          }}
-        >
-          {katakana}
-        </p>
-
-        {/* story（漢字の物語） */}
-        <p
-          style={{
-            fontSize: "10px",
-            fontStyle: "italic",
-            textAlign: "center",
-            marginTop: "8px",
-            marginBottom: 0,
-            whiteSpace: "nowrap",
-            width: "100%",
-            color: "#666666",
-          }}
-        >
-          &ldquo;{story}&rdquo;
-        </p>
-
-        {/* ウォーターマーク */}
-        <p
+        {/* 下部テキスト群 — 下部固定 */}
+        <div
           style={{
             position: "absolute",
-            bottom: "8px",
+            bottom: "28px",
             left: 0,
             right: 0,
-            fontSize: "8px",
-            letterSpacing: "0.15em",
-            textAlign: "center",
-            color: "#444444",
-            margin: 0,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "6px",
           }}
         >
-          kanjime.vercel.app
-        </p>
+          {/* カタカナ読み */}
+          <p
+            style={{
+              fontSize: "13px",
+              letterSpacing: "0.18em",
+              color: "#FD551D",
+              margin: 0,
+              fontWeight: 500,
+              fontFamily: "'Space Grotesk', sans-serif",
+              textAlign: "center",
+            }}
+          >
+            {katakana}
+          </p>
+
+          {/* story（漢字の物語） */}
+          <p
+            style={{
+              fontSize: "9px",
+              fontStyle: "italic",
+              textAlign: "center",
+              margin: 0,
+              whiteSpace: "nowrap",
+              color: "#555555",
+              fontFamily: "'Space Grotesk', sans-serif",
+              letterSpacing: "0.02em",
+            }}
+          >
+            &ldquo;{story}&rdquo;
+          </p>
+
+          {/* ウォーターマーク */}
+          <p
+            style={{
+              fontSize: "7px",
+              letterSpacing: "0.2em",
+              textAlign: "center",
+              color: "#333333",
+              margin: 0,
+              marginTop: "4px",
+              fontFamily: "'JetBrains Mono', monospace",
+              textTransform: "uppercase",
+            }}
+          >
+            kanjime.vercel.app
+          </p>
+        </div>
       </div>
     </div>
   );
