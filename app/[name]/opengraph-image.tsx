@@ -10,10 +10,18 @@ export default async function Image({ params }: { params: Promise<{ name: string
   const { name } = await params;
   const result = await kv.get<KanjiResult>(`kanji:${name.toLowerCase()}`);
 
-  // フォントファイル読み込み
+  // Google Fonts APIからフォントを取得（Edge Function軽量化のため）
   const fontData = await fetch(
-    new URL("../../public/fonts/ShipporiMinchoB1-ExtraBold.ttf", import.meta.url)
-  ).then((res) => res.arrayBuffer());
+    "https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@800&display=swap",
+    { headers: { "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)" } }
+  )
+    .then((res) => res.text())
+    .then((css) => {
+      const match = css.match(/src: url\((.+?)\)/);
+      if (!match) throw new Error("Font URL not found");
+      return fetch(match[1]);
+    })
+    .then((res) => res.arrayBuffer());
 
   const displayName = name.replace(/-/g, " ").toUpperCase();
   const kanjiText = result?.kanji || "漢";
