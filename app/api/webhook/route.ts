@@ -3,7 +3,9 @@ import { kv } from "@vercel/kv";
 import { NextRequest, NextResponse } from "next/server";
 
 function getStripe() {
-  return new Stripe(process.env.STRIPE_SECRET_KEY!);
+  return new Stripe(process.env.STRIPE_SECRET_KEY!, {
+    httpClient: Stripe.createFetchHttpClient(),
+  });
 }
 
 export async function POST(request: NextRequest) {
