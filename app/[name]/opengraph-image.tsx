@@ -37,31 +37,31 @@ export default async function Image({ params }: { params: Promise<{ name: string
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          background: "linear-gradient(135deg, #f5f0e8, #ede6d6)",
+          background: "#0A0A0A",
           position: "relative",
         }}
       >
-        {/* 上部の朱色ライン */}
+        {/* 上部のオレンジライン */}
         <div
           style={{
             position: "absolute",
             top: 0,
             left: 60,
             right: 60,
-            height: 4,
-            background: "#c41e3a",
-            opacity: 0.6,
+            height: 3,
+            background: "#FD551D",
           }}
         />
 
         {/* ローマ字名 */}
         <div
           style={{
-            fontSize: 20,
-            letterSpacing: "0.3em",
-            color: "#999",
-            marginBottom: 20,
+            fontSize: 18,
+            letterSpacing: "0.35em",
+            color: "#FD551D",
+            marginBottom: 28,
             fontFamily: "sans-serif",
+            fontWeight: 600,
           }}
         >
           {displayName}
@@ -73,7 +73,7 @@ export default async function Image({ params }: { params: Promise<{ name: string
             fontSize: 160,
             fontFamily: "Shippori Mincho B1",
             fontWeight: 800,
-            color: "#1a1a1a",
+            color: "#ffffff",
             lineHeight: 1,
           }}
         >
@@ -85,9 +85,9 @@ export default async function Image({ params }: { params: Promise<{ name: string
           <div
             style={{
               fontSize: 18,
-              color: "#888",
+              color: "#555555",
               fontStyle: "italic",
-              marginTop: 24,
+              marginTop: 28,
               fontFamily: "sans-serif",
             }}
           >
@@ -100,10 +100,11 @@ export default async function Image({ params }: { params: Promise<{ name: string
           style={{
             position: "absolute",
             bottom: 20,
-            fontSize: 14,
-            letterSpacing: "0.15em",
-            color: "#bbb",
+            fontSize: 12,
+            letterSpacing: "0.2em",
+            color: "#333333",
             fontFamily: "sans-serif",
+            textTransform: "uppercase",
           }}
         >
           kanjime.vercel.app

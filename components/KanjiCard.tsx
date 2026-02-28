@@ -62,7 +62,7 @@ export default function KanjiCard({
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          padding: "40px 32px 36px",
+          padding: "56px 32px 100px",
         }}
       >
         {/* ローマ字名 — 上部固定 */}
@@ -74,6 +74,7 @@ export default function KanjiCard({
             right: 0,
             fontSize: "11px",
             letterSpacing: "0.35em",
+            textIndent: "0.35em",
             textTransform: "uppercase",
             fontWeight: 600,
             color: "#FD551D",
@@ -85,13 +86,9 @@ export default function KanjiCard({
           {name}
         </p>
 
-        {/* 漢字（縦書き・光学的中心に配置） */}
+        {/* 漢字（縦書き・flexbox中央配置） */}
         <div
           style={{
-            position: "absolute",
-            top: "46%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
             writingMode: "vertical-rl",
           }}
         >
@@ -127,8 +124,9 @@ export default function KanjiCard({
           {/* カタカナ読み */}
           <p
             style={{
-              fontSize: "13px",
+              fontSize: "11.5px",
               letterSpacing: "0.18em",
+              textIndent: "0.18em",
               color: "#FD551D",
               margin: 0,
               fontWeight: 500,

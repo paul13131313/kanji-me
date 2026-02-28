@@ -303,6 +303,7 @@ export default function Home() {
           <ShareButtons
             name={inputName}
             kanji={result.kanji}
+            story={result.story}
             onTryAnother={handleTryAnother}
             onTryDifferentKanji={handleTryDifferentKanji}
             isLoading={isLoading}
