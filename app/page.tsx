@@ -304,7 +304,6 @@ export default function Home() {
             name={inputName}
             kanji={result.kanji}
             story={result.story}
-            onTryAnother={handleTryAnother}
             onTryDifferentKanji={handleTryDifferentKanji}
             isLoading={isLoading}
           />

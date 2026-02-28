@@ -6,7 +6,6 @@ interface ShareButtonsProps {
   name: string;
   kanji: string;
   story: string;
-  onTryAnother: () => void;
   onTryDifferentKanji: () => void;
   isLoading: boolean;
 }
@@ -41,7 +40,6 @@ export default function ShareButtons({
   name,
   kanji,
   story,
-  onTryAnother,
   onTryDifferentKanji,
   isLoading,
 }: ShareButtonsProps) {
@@ -320,19 +318,6 @@ export default function ShareButtons({
         }}
       >
         {isLoading ? "Generating..." : "Try Different Kanji"}
-      </button>
-
-      {/* Try another name */}
-      <button
-        onClick={onTryAnother}
-        style={{
-          ...buttonBase,
-          width: "100%",
-          background: "#FD551D",
-          color: "#141314",
-        }}
-      >
-        Try another name
       </button>
 
       {/* トースト通知 */}

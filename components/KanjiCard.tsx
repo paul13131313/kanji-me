@@ -86,26 +86,30 @@ export default function KanjiCard({
           {name}
         </p>
 
-        {/* 漢字（縦書き・flexbox中央配置） */}
+        {/* 漢字（各文字を縦に積む — html2canvas互換） */}
         <div
           style={{
-            writingMode: "vertical-rl",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
           }}
         >
-          <p
-            style={{
-              lineHeight: 1.08,
-              fontFamily: "'Shippori Mincho B1', serif",
-              fontWeight: 800,
-              fontSize: `${getKanjiFontSize(kanji.length)}px`,
-              color: "#ffffff",
-              whiteSpace: "nowrap",
-              margin: 0,
-              padding: 0,
-            }}
-          >
-            {kanji}
-          </p>
+          {kanji.split("").map((char, i) => (
+            <span
+              key={i}
+              style={{
+                display: "block",
+                lineHeight: 1.08,
+                fontFamily: "'Shippori Mincho B1', serif",
+                fontWeight: 800,
+                fontSize: `${getKanjiFontSize(kanji.length)}px`,
+                color: "#ffffff",
+                textAlign: "center",
+              }}
+            >
+              {char}
+            </span>
+          ))}
         </div>
 
         {/* 下部テキスト群 — 下部固定 */}
