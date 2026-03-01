@@ -1,5 +1,4 @@
 import { ImageResponse } from "next/og";
-import { kv } from "@vercel/kv";
 import type { KanjiResult } from "@/lib/types";
 
 export const size = { width: 1200, height: 630 };
@@ -34,8 +33,9 @@ export default async function Image({ params }: { params: Promise<{ name: string
   let kanjiText = "漢";
   let storyText = "";
 
-  // KVからデータ取得（失敗してもフォールバック）
+  // KVからデータ取得（動的import + 失敗時フォールバック）
   try {
+    const { kv } = await import("@vercel/kv");
     const result = await kv.get<KanjiResult>(`kanji:${name.toLowerCase()}`);
     if (result) {
       kanjiText = result.kanji;
