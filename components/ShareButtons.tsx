@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useState, useEffect, useRef } from "react";
+import { track } from "@vercel/analytics";
 
 interface ShareButtonsProps {
   name: string;
@@ -70,6 +71,7 @@ export default function ShareButtons({
 
   // モバイル: Web Share API（画像ファイル付き）
   const handleShareMobile = useCallback(async () => {
+    track("share_clicked", { platform: "mobile_native" });
     setIsGenerating(true);
     try {
       const { blob } = await generateCardImage();
@@ -125,6 +127,7 @@ export default function ShareButtons({
 
   // X (Twitter) Intent
   const handleShareX = useCallback(() => {
+    track("share_clicked", { platform: "x" });
     const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(viralText)}&url=${encodeURIComponent(shareUrl)}`;
     window.open(url, "_blank", "width=550,height=420");
     setShowShareMenu(false);
@@ -132,6 +135,7 @@ export default function ShareButtons({
 
   // Facebook Share Dialog
   const handleShareFacebook = useCallback(() => {
+    track("share_clicked", { platform: "facebook" });
     const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
     window.open(url, "_blank", "width=550,height=420");
     setShowShareMenu(false);
@@ -139,6 +143,7 @@ export default function ShareButtons({
 
   // Copy Link
   const handleCopyLink = useCallback(async () => {
+    track("share_clicked", { platform: "copy_link" });
     await navigator.clipboard.writeText(shareUrl);
     setShowCopiedToast(true);
     setTimeout(() => setShowCopiedToast(false), 2000);
@@ -147,6 +152,7 @@ export default function ShareButtons({
 
   // Save Image（ダウンロード）
   const handleSaveImage = useCallback(async () => {
+    track("share_clicked", { platform: "save_image" });
     setIsGenerating(true);
     try {
       const { dataUrl } = await generateCardImage();

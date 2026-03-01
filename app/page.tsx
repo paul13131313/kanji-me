@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback, useEffect } from "react";
+import { track } from "@vercel/analytics";
 import NameInput from "@/components/NameInput";
 import KanjiCard from "@/components/KanjiCard";
 import MeaningList from "@/components/MeaningList";
@@ -169,6 +170,15 @@ export default function Home() {
       setResult(data);
       setInputName(name);
       setPreviousKanji((prev) => (exclude ? [...prev, data.kanji] : [data.kanji]));
+
+      // 初回生成時のみURLを /[name] に更新（シェアURLと一致させる）
+      if (!exclude) {
+        const normalized = name.toLowerCase().trim().replace(/\s+/g, "-");
+        window.history.pushState({}, "", `/${normalized}`);
+        track("kanji_generated", { name });
+      } else {
+        track("kanji_regenerated", { name });
+      }
     } catch {
       setError("Network error. Please try again.");
     } finally {
@@ -190,6 +200,7 @@ export default function Home() {
     setError("");
     setPreviousKanji([]);
     setShowLimitReached(false);
+    window.history.pushState({}, "", "/");
     if (inputRef.current) {
       inputRef.current.value = "";
       inputRef.current.scrollIntoView({ behavior: "smooth", block: "center" });

@@ -2,14 +2,33 @@ import { kv } from "@vercel/kv";
 import type { KanjiResult } from "@/lib/types";
 import type { Metadata } from "next";
 import Link from "next/link";
+import PageViewTracker from "@/components/PageViewTracker";
+import { POPULAR_NAMES } from "@/lib/popular-names";
+
+// ISR: 7日ごとに再検証
+export const revalidate = 604800;
+
+// ビルド時に人気名100ページを事前生成
+export async function generateStaticParams() {
+  return POPULAR_NAMES.map((name) => ({ name }));
+}
 
 interface PageProps {
   params: Promise<{ name: string }>;
 }
 
+// KVからデータ取得（KV未設定時はnullを返す）
+async function getKanjiData(name: string): Promise<KanjiResult | null> {
+  try {
+    return await kv.get<KanjiResult>(`kanji:${name.toLowerCase()}`);
+  } catch {
+    return null;
+  }
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { name } = await params;
-  const result = await kv.get<KanjiResult>(`kanji:${name.toLowerCase()}`);
+  const result = await getKanjiData(name);
 
   if (!result) {
     return { title: "KANJI ME" };
@@ -34,7 +53,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function NamePage({ params }: PageProps) {
   const { name } = await params;
-  const result = await kv.get<KanjiResult>(`kanji:${name.toLowerCase()}`);
+  const result = await getKanjiData(name);
   const displayName = name.replace(/-/g, " ");
 
   return (
@@ -42,6 +61,7 @@ export default async function NamePage({ params }: PageProps) {
       className="min-h-dvh flex flex-col items-center justify-center px-4 py-12 gap-10"
       style={{ background: "#141314", fontFamily: "'Space Grotesk', sans-serif" }}
     >
+      <PageViewTracker name={name} />
       {result ? (
         <>
           {/* 漢字カード風の表示 */}
