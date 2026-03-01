@@ -17,9 +17,13 @@ async function generateCardImage(): Promise<{ blob: Blob; dataUrl: string }> {
 
   const html2canvas = (await import("html2canvas")).default;
   const canvas = await html2canvas(card, {
-    backgroundColor: null,
+    backgroundColor: "#0A0A0A",
     scale: 3, // 1080x1440 — Instagram Stories最適サイズ
     useCORS: true,
+    width: card.offsetWidth,
+    height: card.offsetHeight,
+    scrollX: 0,
+    scrollY: 0,
   });
 
   return new Promise((resolve, reject) => {
@@ -50,7 +54,7 @@ export default function ShareButtons({
 
   const shareUrl = `https://kanji-me.vercel.app/${name.toLowerCase().replace(/\s+/g, "-")}`;
 
-  const viralText = `My name in kanji: ${kanji}\n"${story}"\n\nWhat does YOUR name look like in Japanese?`;
+  const viralText = `My name in kanji: ${kanji}\n"${story}"\n\nWhat does YOUR name look like in Japanese?\n${shareUrl}`;
 
   // メニュー外クリックで閉じる
   useEffect(() => {
@@ -77,7 +81,6 @@ export default function ShareButtons({
 
       const shareData: ShareData = {
         text: viralText,
-        url: shareUrl,
         files: [file],
       };
 
@@ -85,14 +88,22 @@ export default function ShareButtons({
       if (navigator.canShare && navigator.canShare(shareData)) {
         await navigator.share(shareData);
       } else {
-        // ファイル非対応 → テキスト+URLだけ
+        // ファイル非対応 → テキストだけ（URL含む）
         await navigator.share({
           text: viralText,
-          url: shareUrl,
         });
       }
-    } catch {
-      // ユーザーがキャンセル
+    } catch (e) {
+      // ユーザーキャンセル以外 → クリップボードにコピー
+      if (e instanceof Error && e.name !== "AbortError") {
+        try {
+          await navigator.clipboard.writeText(viralText);
+          setShowCopiedToast(true);
+          setTimeout(() => setShowCopiedToast(false), 2000);
+        } catch {
+          // クリップボードも失敗
+        }
+      }
     } finally {
       setIsGenerating(false);
     }
@@ -103,7 +114,7 @@ export default function ShareButtons({
     typeof window !== "undefined" &&
     ("ontouchstart" in window || navigator.maxTouchPoints > 0);
 
-  // Share Your Kanji ボタン
+  // Share ボタン
   const handleShareClick = useCallback(() => {
     if (isMobile && typeof navigator !== "undefined" && "share" in navigator) {
       handleShareMobile();
@@ -175,112 +186,110 @@ export default function ShareButtons({
         fontFamily: "'Space Grotesk', sans-serif",
       }}
     >
-      {/* メインCTA: Share Your Kanji */}
-      <div style={{ position: "relative" }} ref={menuRef}>
-        <button
-          onClick={handleShareClick}
-          disabled={isGenerating}
-          style={{
-            ...buttonBase,
-            width: "100%",
-            background: "#FD551D",
-            color: "#141314",
-            opacity: isGenerating ? 0.6 : 1,
-          }}
-        >
-          {isGenerating ? "Preparing..." : "Share Your Kanji"}
-        </button>
-
-        {/* デスクトップ用ドロップダウン */}
-        {showShareMenu && (
-          <div
+      {/* メイン行: SHARE + SAVE */}
+      <div style={{ display: "flex", gap: "12px" }}>
+        {/* SHARE ボタン */}
+        <div style={{ position: "relative", flex: 1 }} ref={menuRef}>
+          <button
+            onClick={handleShareClick}
+            disabled={isGenerating}
             style={{
-              position: "absolute",
-              top: "calc(100% + 6px)",
-              left: 0,
-              right: 0,
-              background: "#1a1a1a",
-              border: "1px solid #333",
-              borderRadius: "6px",
-              overflow: "hidden",
-              zIndex: 50,
+              ...buttonBase,
+              width: "100%",
+              background: "#FD551D",
+              color: "#141314",
+              opacity: isGenerating ? 0.6 : 1,
             }}
           >
-            <button
-              onClick={handleShareX}
-              style={{
-                ...buttonBase,
-                width: "100%",
-                background: "transparent",
-                color: "#EEEEEE",
-                padding: "12px 16px",
-                textAlign: "left",
-                display: "flex",
-                alignItems: "center",
-                gap: "10px",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = "#262626")}
-              onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-            >
-              {/* X icon */}
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="#EEEEEE">
-                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-              </svg>
-              Share on X
-            </button>
-            <button
-              onClick={handleShareFacebook}
-              style={{
-                ...buttonBase,
-                width: "100%",
-                background: "transparent",
-                color: "#EEEEEE",
-                padding: "12px 16px",
-                textAlign: "left",
-                display: "flex",
-                alignItems: "center",
-                gap: "10px",
-                borderTop: "1px solid #2a2a2a",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = "#262626")}
-              onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-            >
-              {/* Facebook icon */}
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="#EEEEEE">
-                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-              </svg>
-              Share on Facebook
-            </button>
-            <button
-              onClick={handleCopyLink}
-              style={{
-                ...buttonBase,
-                width: "100%",
-                background: "transparent",
-                color: "#EEEEEE",
-                padding: "12px 16px",
-                textAlign: "left",
-                display: "flex",
-                alignItems: "center",
-                gap: "10px",
-                borderTop: "1px solid #2a2a2a",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = "#262626")}
-              onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-            >
-              {/* Link icon */}
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#EEEEEE" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-              </svg>
-              Copy Link
-            </button>
-          </div>
-        )}
-      </div>
+            {isGenerating ? "..." : "Share"}
+          </button>
 
-      {/* サブ行: Save Image + Copy Link */}
-      <div style={{ display: "flex", gap: "12px" }}>
+          {/* デスクトップ用ドロップダウン */}
+          {showShareMenu && (
+            <div
+              style={{
+                position: "absolute",
+                top: "calc(100% + 6px)",
+                left: 0,
+                right: 0,
+                background: "#1a1a1a",
+                border: "1px solid #333",
+                borderRadius: "6px",
+                overflow: "hidden",
+                zIndex: 50,
+              }}
+            >
+              <button
+                onClick={handleShareX}
+                style={{
+                  ...buttonBase,
+                  width: "100%",
+                  background: "transparent",
+                  color: "#EEEEEE",
+                  padding: "12px 16px",
+                  textAlign: "left",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = "#262626")}
+                onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="#EEEEEE">
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                </svg>
+                Share on X
+              </button>
+              <button
+                onClick={handleShareFacebook}
+                style={{
+                  ...buttonBase,
+                  width: "100%",
+                  background: "transparent",
+                  color: "#EEEEEE",
+                  padding: "12px 16px",
+                  textAlign: "left",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  borderTop: "1px solid #2a2a2a",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = "#262626")}
+                onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="#EEEEEE">
+                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                </svg>
+                Share on Facebook
+              </button>
+              <button
+                onClick={handleCopyLink}
+                style={{
+                  ...buttonBase,
+                  width: "100%",
+                  background: "transparent",
+                  color: "#EEEEEE",
+                  padding: "12px 16px",
+                  textAlign: "left",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  borderTop: "1px solid #2a2a2a",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = "#262626")}
+                onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#EEEEEE" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                </svg>
+                Copy Link
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* SAVE ボタン */}
         <button
           onClick={handleSaveImage}
           disabled={isGenerating}
@@ -293,19 +302,7 @@ export default function ShareButtons({
             opacity: isGenerating ? 0.5 : 1,
           }}
         >
-          Save Image
-        </button>
-        <button
-          onClick={handleCopyLink}
-          style={{
-            ...buttonBase,
-            flex: 1,
-            border: "1px solid #FD551D",
-            color: "#FD551D",
-            background: "transparent",
-          }}
-        >
-          Copy Link
+          {isGenerating ? "..." : "Save"}
         </button>
       </div>
 

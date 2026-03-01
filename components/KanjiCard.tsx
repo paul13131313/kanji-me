@@ -170,7 +170,7 @@ export default function KanjiCard({
               textTransform: "uppercase",
             }}
           >
-            kanjime.vercel.app
+            kanji-me.vercel.app
           </p>
         </div>
       </div>
