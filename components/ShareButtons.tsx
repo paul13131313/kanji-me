@@ -54,7 +54,7 @@ export default function ShareButtons({
 
   const shareUrl = `https://kanji-me.vercel.app/${name.toLowerCase().replace(/\s+/g, "-")}`;
 
-  const viralText = `My name in kanji: ${kanji}\n"${story}"\n\nWhat does YOUR name look like in Japanese?\n${shareUrl}`;
+  const viralText = `My name in kanji: ${kanji}\n"${story}"\n\nWhat does YOUR name look like in Japanese?\n${shareUrl}\n\n#kanjime`;
 
   // メニュー外クリックで閉じる
   useEffect(() => {
