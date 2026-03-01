@@ -8,22 +8,28 @@ export default async function Image({ params }: { params: Promise<{ name: string
   const { name } = await params;
   const displayName = name.replace(/-/g, " ").toUpperCase();
 
+  // KV REST APIで直接取得（@vercel/kvモジュール不使用）
   let kanjiText = "";
   let storyText = "";
-
-  // 1. まずKVからデータ取得（直列で実行）
   try {
-    const { kv } = await import("@vercel/kv");
-    const result = await kv.get<{ kanji: string; story?: string }>(`kanji:${name.toLowerCase()}`);
-    if (result) {
-      kanjiText = result.kanji;
-      storyText = result.story || "";
+    const kvUrl = process.env.KV_REST_API_URL;
+    const kvToken = process.env.KV_REST_API_TOKEN;
+    if (kvUrl && kvToken) {
+      const res = await fetch(`${kvUrl}/get/kanji:${name.toLowerCase()}`, {
+        headers: { Authorization: `Bearer ${kvToken}` },
+      });
+      const data = await res.json();
+      if (data.result) {
+        const parsed = JSON.parse(data.result);
+        kanjiText = parsed.kanji || "";
+        storyText = parsed.story || "";
+      }
     }
   } catch {
     // KV失敗
   }
 
-  // 2. 漢字があればフォントサブセットを取得
+  // 漢字があればフォントサブセットを取得
   let fontData: ArrayBuffer | null = null;
   if (kanjiText) {
     try {
@@ -68,12 +74,10 @@ export default async function Image({ params }: { params: Promise<{ name: string
           }}
         />
 
-        {/* ローマ字名 */}
         <div style={{ fontSize: 18, letterSpacing: "0.35em", color: "#FD551D", marginBottom: 28, fontWeight: 600 }}>
           {displayName}
         </div>
 
-        {/* 漢字 */}
         {kanjiText ? (
           <div
             style={{
@@ -92,14 +96,12 @@ export default async function Image({ params }: { params: Promise<{ name: string
           </div>
         )}
 
-        {/* story */}
         {storyText && (
           <div style={{ fontSize: 18, color: "#555555", fontStyle: "italic", marginTop: 28 }}>
             &ldquo;{storyText}&rdquo;
           </div>
         )}
 
-        {/* ウォーターマーク */}
         <div
           style={{
             position: "absolute",
