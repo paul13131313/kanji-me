@@ -9,9 +9,10 @@ async function loadFontForText(text: string): Promise<ArrayBuffer | null> {
   if (!text) return null;
   try {
     const encodedText = encodeURIComponent(text);
+    // 古いUAを使うとTTF形式で返る（SatoriはWOFF2非対応、TTFが必要）
     const css = await fetch(
       `https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@800&display=swap&text=${encodedText}`,
-      { headers: { "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120.0.0.0" } }
+      { headers: { "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)" } }
     ).then((res) => res.text());
 
     const match = css.match(/src: url\((.+?)\)/);
