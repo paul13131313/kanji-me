@@ -1,0 +1,21 @@
+{
+  "name": "KANJI ME",
+  "short_name": "KANJI ME",
+  "description": "Transform your name into beautiful Japanese kanji characters",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#141314",
+  "theme_color": "#FD551D",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
