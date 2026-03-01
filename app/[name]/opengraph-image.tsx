@@ -5,6 +5,8 @@ import type { KanjiResult } from "@/lib/types";
 export const runtime = "edge";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
+// Facebookクローラーのタイムアウト対策：キャッシュを効かせる
+export const revalidate = 86400; // 24時間キャッシュ
 
 export default async function Image({ params }: { params: Promise<{ name: string }> }) {
   const { name } = await params;
@@ -107,7 +109,7 @@ export default async function Image({ params }: { params: Promise<{ name: string
             textTransform: "uppercase",
           }}
         >
-          kanjime.vercel.app
+          kanji-me.vercel.app
         </div>
       </div>
     ),
