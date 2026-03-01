@@ -6,7 +6,8 @@
  * (.env.local から自動読み込み)
  */
 
-import "dotenv/config";
+import { config } from "dotenv";
+config({ path: ".env.local" });
 import Anthropic from "@anthropic-ai/sdk";
 import { kv } from "@vercel/kv";
 import { SYSTEM_PROMPT } from "../lib/prompt";
