@@ -4,47 +4,27 @@ export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 export const revalidate = 86400;
 
-// 表示する文字だけを含むフォントサブセットを取得
-async function loadFontForText(text: string): Promise<ArrayBuffer | null> {
-  if (!text) return null;
+export default async function Image({ params }: { params: Promise<{ name: string }> }) {
+  const { name } = await params;
+  const displayName = name.replace(/-/g, " ").toUpperCase();
+  const testKanji = "蒼龍";
+
+  // フォントサブセット取得テスト
+  let fontData: ArrayBuffer | null = null;
   try {
-    const encodedText = encodeURIComponent(text);
-    // 古いUAを使うとTTF形式で返る（SatoriはWOFF2非対応、TTFが必要）
+    const encodedText = encodeURIComponent(testKanji);
     const css = await fetch(
       `https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@800&display=swap&text=${encodedText}`,
       { headers: { "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)" } }
     ).then((res) => res.text());
 
     const match = css.match(/src: url\((.+?)\)/);
-    if (!match) return null;
-
-    return await fetch(match[1]).then((res) => res.arrayBuffer());
-  } catch {
-    return null;
-  }
-}
-
-export default async function Image({ params }: { params: Promise<{ name: string }> }) {
-  const { name } = await params;
-  const displayName = name.replace(/-/g, " ").toUpperCase();
-
-  let kanjiText = "";
-  let storyText = "";
-
-  // KVからデータ取得
-  try {
-    const { kv } = await import("@vercel/kv");
-    const result = await kv.get<{ kanji: string; story?: string }>(`kanji:${name.toLowerCase()}`);
-    if (result) {
-      kanjiText = result.kanji;
-      storyText = result.story || "";
+    if (match) {
+      fontData = await fetch(match[1]).then((res) => res.arrayBuffer());
     }
   } catch {
-    // KV失敗
+    // フォント取得失敗
   }
-
-  // 漢字テキスト用のフォントサブセットを取得（必要な文字だけ）
-  const fontData = kanjiText ? await loadFontForText(kanjiText) : null;
 
   return new ImageResponse(
     (
@@ -57,64 +37,20 @@ export default async function Image({ params }: { params: Promise<{ name: string
           alignItems: "center",
           justifyContent: "center",
           background: "#0A0A0A",
-          position: "relative",
         }}
       >
-        {/* 上部のオレンジライン */}
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 60,
-            right: 60,
-            height: 3,
-            background: "#FD551D",
-          }}
-        />
-
-        {/* ローマ字名 */}
-        <div style={{ fontSize: 18, letterSpacing: "0.35em", color: "#FD551D", marginBottom: 28, fontWeight: 600 }}>
+        <div style={{ fontSize: 18, color: "#FD551D", letterSpacing: "0.35em", marginBottom: 28 }}>
           {displayName}
         </div>
-
-        {/* 漢字 */}
-        {kanjiText ? (
-          <div
-            style={{
-              fontSize: 160,
-              ...(fontData ? { fontFamily: "Shippori Mincho B1" } : {}),
-              fontWeight: 800,
-              color: "#ffffff",
-              lineHeight: 1,
-            }}
-          >
-            {kanjiText}
-          </div>
-        ) : (
-          <div style={{ fontSize: 64, color: "#ffffff", fontWeight: 700 }}>
-            KANJI ME
-          </div>
-        )}
-
-        {/* story */}
-        {storyText && (
-          <div style={{ fontSize: 18, color: "#555555", fontStyle: "italic", marginTop: 28 }}>
-            &ldquo;{storyText}&rdquo;
-          </div>
-        )}
-
-        {/* ウォーターマーク */}
         <div
           style={{
-            position: "absolute",
-            bottom: 20,
-            fontSize: 12,
-            letterSpacing: "0.2em",
-            color: "#333333",
-            textTransform: "uppercase",
+            fontSize: 160,
+            ...(fontData ? { fontFamily: "Shippori Mincho B1" } : {}),
+            fontWeight: 800,
+            color: "#ffffff",
           }}
         >
-          kanji-me.vercel.app
+          {fontData ? testKanji : "KANJI ME"}
         </div>
       </div>
     ),
