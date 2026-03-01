@@ -8,22 +8,35 @@ export const contentType = "image/png";
 // Facebookクローラーのタイムアウト対策：キャッシュを効かせる
 export const revalidate = 86400; // 24時間キャッシュ
 
+// フォントをモジュールレベルでキャッシュ（コールドスタート時に1回だけフェッチ）
+let fontCache: ArrayBuffer | null = null;
+
+async function loadFont(): Promise<ArrayBuffer | null> {
+  if (fontCache) return fontCache;
+  try {
+    const css = await fetch(
+      "https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@800&display=swap",
+      { headers: { "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)" } }
+    ).then((res) => res.text());
+
+    const match = css.match(/src: url\((.+?)\)/);
+    if (!match) return null;
+
+    fontCache = await fetch(match[1]).then((res) => res.arrayBuffer());
+    return fontCache;
+  } catch {
+    return null;
+  }
+}
+
 export default async function Image({ params }: { params: Promise<{ name: string }> }) {
   const { name } = await params;
-  const result = await kv.get<KanjiResult>(`kanji:${name.toLowerCase()}`);
 
-  // Google Fonts APIからフォントを取得（Edge Function軽量化のため）
-  const fontData = await fetch(
-    "https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@800&display=swap",
-    { headers: { "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)" } }
-  )
-    .then((res) => res.text())
-    .then((css) => {
-      const match = css.match(/src: url\((.+?)\)/);
-      if (!match) throw new Error("Font URL not found");
-      return fetch(match[1]);
-    })
-    .then((res) => res.arrayBuffer());
+  // フォントとKVデータを並列フェッチ
+  const [fontData, result] = await Promise.all([
+    loadFont(),
+    kv.get<KanjiResult>(`kanji:${name.toLowerCase()}`),
+  ]);
 
   const displayName = name.replace(/-/g, " ").toUpperCase();
   const kanjiText = result?.kanji || "漢";
@@ -115,14 +128,18 @@ export default async function Image({ params }: { params: Promise<{ name: string
     ),
     {
       ...size,
-      fonts: [
-        {
-          name: "Shippori Mincho B1",
-          data: fontData,
-          style: "normal",
-          weight: 800,
-        },
-      ],
+      ...(fontData
+        ? {
+            fonts: [
+              {
+                name: "Shippori Mincho B1",
+                data: fontData,
+                style: "normal" as const,
+                weight: 800 as const,
+              },
+            ],
+          }
+        : {}),
     }
   );
 }
