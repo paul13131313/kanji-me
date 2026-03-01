@@ -152,6 +152,14 @@ export async function POST(request: NextRequest) {
       console.error("KV save error (non-fatal):", kvError);
     }
 
+    // OG画像をプリウォーム（Facebookクローラー対策：初回アクセス時にキャッシュ生成）
+    try {
+      const ogUrl = `https://kanji-me.vercel.app/${normalizedName}/opengraph-image`;
+      fetch(ogUrl).catch(() => {}); // fire-and-forget
+    } catch {
+      // non-fatal
+    }
+
     const response: Record<string, unknown> = { ...result };
     if (usedPaidSession) {
       const paidData = await kv.get<{ remaining: number }>(`paid:${paidSessionId}`);
