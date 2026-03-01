@@ -8,9 +8,8 @@ export default async function Image({ params }: { params: Promise<{ name: string
   const { name } = await params;
   const displayName = name.replace(/-/g, " ").toUpperCase();
 
-  // KV REST APIで直接取得（@vercel/kvモジュール不使用）
+  // KV REST APIで直接取得
   let kanjiText = "";
-  let storyText = "";
   try {
     const kvUrl = process.env.KV_REST_API_URL;
     const kvToken = process.env.KV_REST_API_TOKEN;
@@ -22,14 +21,13 @@ export default async function Image({ params }: { params: Promise<{ name: string
       if (data.result) {
         const parsed = JSON.parse(data.result);
         kanjiText = parsed.kanji || "";
-        storyText = parsed.story || "";
       }
     }
   } catch {
     // KV失敗
   }
 
-  // 漢字があればフォントサブセットを取得
+  // フォントサブセット取得
   let fontData: ArrayBuffer | null = null;
   if (kanjiText) {
     try {
@@ -44,10 +42,11 @@ export default async function Image({ params }: { params: Promise<{ name: string
         fontData = await fetch(match[1]).then((res) => res.arrayBuffer());
       }
     } catch {
-      // フォント取得失敗
+      // フォント失敗
     }
   }
 
+  // シンプルなJSX（position:absoluteなし）
   return new ImageResponse(
     (
       <div
@@ -59,60 +58,20 @@ export default async function Image({ params }: { params: Promise<{ name: string
           alignItems: "center",
           justifyContent: "center",
           background: "#0A0A0A",
-          position: "relative",
         }}
       >
-        {/* 上部のオレンジライン */}
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 60,
-            right: 60,
-            height: 3,
-            background: "#FD551D",
-          }}
-        />
-
-        <div style={{ fontSize: 18, letterSpacing: "0.35em", color: "#FD551D", marginBottom: 28, fontWeight: 600 }}>
+        <div style={{ fontSize: 18, color: "#FD551D", letterSpacing: "0.35em", marginBottom: 28 }}>
           {displayName}
         </div>
-
-        {kanjiText ? (
-          <div
-            style={{
-              fontSize: 160,
-              ...(fontData ? { fontFamily: "Shippori Mincho B1" } : {}),
-              fontWeight: 800,
-              color: "#ffffff",
-              lineHeight: 1,
-            }}
-          >
-            {kanjiText}
-          </div>
-        ) : (
-          <div style={{ fontSize: 64, color: "#ffffff", fontWeight: 700 }}>
-            KANJI ME
-          </div>
-        )}
-
-        {storyText && (
-          <div style={{ fontSize: 18, color: "#555555", fontStyle: "italic", marginTop: 28 }}>
-            &ldquo;{storyText}&rdquo;
-          </div>
-        )}
-
         <div
           style={{
-            position: "absolute",
-            bottom: 20,
-            fontSize: 12,
-            letterSpacing: "0.2em",
-            color: "#333333",
-            textTransform: "uppercase",
+            fontSize: 160,
+            ...(fontData ? { fontFamily: "Shippori Mincho B1" } : {}),
+            fontWeight: 800,
+            color: "#ffffff",
           }}
         >
-          kanji-me.vercel.app
+          {kanjiText || "KANJI ME"}
         </div>
       </div>
     ),
