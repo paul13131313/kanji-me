@@ -10,6 +10,7 @@ export default async function Image({ params }: { params: Promise<{ name: string
 
   // KV REST APIで直接取得
   let kanjiText = "";
+  let storyText = "";
   try {
     const kvUrl = process.env.KV_REST_API_URL;
     const kvToken = process.env.KV_REST_API_TOKEN;
@@ -21,13 +22,14 @@ export default async function Image({ params }: { params: Promise<{ name: string
       if (data.result) {
         const parsed = JSON.parse(data.result);
         kanjiText = parsed.kanji || "";
+        storyText = parsed.story || "";
       }
     }
   } catch {
     // KV失敗
   }
 
-  // フォントサブセット取得
+  // 漢字があればフォントサブセット取得（必要な文字だけ＝数KB）
   let fontData: ArrayBuffer | null = null;
   if (kanjiText) {
     try {
@@ -46,7 +48,6 @@ export default async function Image({ params }: { params: Promise<{ name: string
     }
   }
 
-  // シンプルなJSX（position:absoluteなし）
   return new ImageResponse(
     (
       <div
@@ -58,20 +59,75 @@ export default async function Image({ params }: { params: Promise<{ name: string
           alignItems: "center",
           justifyContent: "center",
           background: "#0A0A0A",
+          padding: "40px 60px",
         }}
       >
-        <div style={{ fontSize: 18, color: "#FD551D", letterSpacing: "0.35em", marginBottom: 28 }}>
-          {displayName}
-        </div>
+        {/* 上部のオレンジライン（borderTopで代用） */}
         <div
           style={{
-            fontSize: 160,
-            ...(fontData ? { fontFamily: "Shippori Mincho B1" } : {}),
-            fontWeight: 800,
-            color: "#ffffff",
+            display: "flex",
+            width: "100%",
+            height: 3,
+            background: "#FD551D",
+            marginBottom: 40,
+            flexShrink: 0,
+          }}
+        />
+
+        {/* メインコンテンツ */}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            flex: 1,
           }}
         >
-          {kanjiText || "KANJI ME"}
+          {/* ローマ字名 */}
+          <div style={{ fontSize: 18, letterSpacing: "0.35em", color: "#FD551D", marginBottom: 28, fontWeight: 600 }}>
+            {displayName}
+          </div>
+
+          {/* 漢字 */}
+          {kanjiText ? (
+            <div
+              style={{
+                fontSize: 160,
+                ...(fontData ? { fontFamily: "Shippori Mincho B1" } : {}),
+                fontWeight: 800,
+                color: "#ffffff",
+                lineHeight: 1,
+              }}
+            >
+              {kanjiText}
+            </div>
+          ) : (
+            <div style={{ fontSize: 64, color: "#ffffff", fontWeight: 700 }}>
+              KANJI ME
+            </div>
+          )}
+
+          {/* story */}
+          {storyText && (
+            <div style={{ fontSize: 18, color: "#555555", fontStyle: "italic", marginTop: 28 }}>
+              {`\u201C${storyText}\u201D`}
+            </div>
+          )}
+        </div>
+
+        {/* ウォーターマーク */}
+        <div
+          style={{
+            fontSize: 12,
+            letterSpacing: "0.2em",
+            color: "#333333",
+            textTransform: "uppercase",
+            marginTop: 20,
+            flexShrink: 0,
+          }}
+        >
+          kanji-me.vercel.app
         </div>
       </div>
     ),
